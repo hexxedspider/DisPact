@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DisPact - Discord Chunk Storage</title>
+    <meta name="description" content="Store and retrieve files using Discord webhooks as distributed chunk storage">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Recent Manifests</h3>
+        </div>
+        <div class="sidebar-content" id="recent-manifests">
+            <p class="no-manifests">No recent manifests yet</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <img src="logo.png" alt="DisPact">
+            </div>
+        </header>
+
+        <div class="main-content">
+            <section class="card upload-section">
+                <div class="card-header">
+                    <h2>Upload File</h2>
+                    <p>Split and upload files as chunks to Discord</p>
+                </div>
+
+                <div class="webhook-input-group">
+                    <label for="webhook-url">Discord Webhook URL</label>
+                    <input type="password" id="webhook-url" placeholder="https://discord.com/api/webhooks/..."
+                        class="input-field">
+                    <button id="toggle-webhook-visibility" class="btn-icon" type="button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="file-upload-zone" id="file-upload-zone">
+                    <input type="file" id="file-input" hidden multiple>
+                    <div class="upload-content">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <h3>Drop your file(s) here,</h3>
+                        <p>or <span class="link">tap</span> to choose a file(s).</p>
+                        <small>Max chunk size: 9.99MB per chunk: file size not restricted, but will take longer to
+                            upload</small>
+                    </div>
+                </div>
+
+                <div id="file-info" class="file-info hidden">
+                    <div id="file-list"></div>
+                    <button id="remove-file" class="btn-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <button id="upload-btn" class="btn btn-primary" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Upload to Discord
+                </button>
+
+                <div id="upload-progress" class="progress-section hidden">
+                    <div class="progress-header">
+                        <span id="progress-text">Uploading...</span>
+                        <span id="progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <div id="chunk-info" class="chunk-info"></div>
+                </div>
+
+                <div id="upload-result" class="result-section hidden">
+                    <div class="result-success">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <h3>Upload Complete!</h3>
+                        <p>All files have been uploaded successfully. Manifest URLs are saved in recent manifests, or
+                            you can copy them manually.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card download-section">
+                <div class="card-header">
+                    <h2>Download File(s)</h2>
+                    <p>Retrieve and reconstruct file from chunks.</p>
+                </div>
+
+                <div class="input-group">
+                    <label for="manifest-input">Manifest URL</label>
+                    <input type="text" id="manifest-input" placeholder="https://cdn.discordapp.com/attachments/..."
+                        class="input-field">
+                </div>
+
+                <button id="download-btn" class="btn btn-secondary" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download File
+                </button>
+
+                <div id="download-progress" class="progress-section hidden">
+                    <div class="progress-header">
+                        <span id="download-progress-text">Downloading...</span>
+                        <span id="download-progress-percentage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="download-progress-fill" class="progress-fill"></div>
+                    </div>
+                    <div id="download-chunk-info" class="chunk-info"></div>
+                </div>
+            </section>
+        </div>
+
+        <div class="about-me">
+            <h3>~Discord/Storage/RynsSpace/README.md</h3>
+            <p>hey. i have many different names, but my main are ryn, spider, and v4mp.</p>
+            <br>
+            <p>i post a lot of my projects on <a href="https://github.com/hexxedspider">github</a>, including this,
+                Discord bots and selfbots, my music related projects, Mega (cloud storage service) automatic account
+                generation, and more.</p>
+            <br>
+            <p>if you have any questions, feel free to ask me on Discord (@yungpharaoh)</p>
+            <br>
+            <p>yes this is the better version of my other project (DisStored)</p>
+        </div>
+
+        <footer class="footer">
+            <p>DisPact - Chunk storage powered by Discord webhooks.</p>
+            <p class="warning">Use responsibly. Don't abuse Discord's infrastructure, and I'm not responsible for any
+                possible abuse. I made this for education and demonstrational purposes.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" crossorigin="anonymous" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DisStored: Cl9ud Edition</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Popup Overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none; /* hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        /* Popup Box */
+        .popup-menu {
+            background: linear-gradient(to bottom, #e0e0e0, #666666);
+            border-radius: 12px;
+            padding: 20px;
+            width: 300px;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideDown 0.4s ease;
+            position: relative;
+        }
+
+        /* Title */
+        .popup-menu h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        /* Close Button */
+        .popup-close {
+            position: absolute;
+            top: 10px; right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Names List */
+        .popup-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 1rem;
+            color: #222;
+        }
+
+        /* Scrollbar Styling */
+        .popup-menu::-webkit-scrollbar {
+            width: 8px;
+        }
+        .popup-menu::-webkit-scrollbar-thumb {
+            background: #666;
+            border-radius: 4px;
+        }
+
+        /* Entry Animation */
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .upload-section {
+            padding: 30px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .folder-section {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .folder-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .folder-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .folder-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .folder-input button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .folder-input button:hover {
+            background: #5a6fd8;
+        }
+
+        .breadcrumb {
+            padding: 15px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb span {
+            color: #666;
+        }
+
+        .files-section {
+            padding: 30px;
+        }
+
+        .files-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .files-title {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .extra-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .extra-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Extra Panel Styles (improved contrast) */
+        .extra-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* darker, semi-opaque overlay to improve contrast against white content */
+            background: rgba(12, 16, 22, 0.72);
+            backdrop-filter: blur(6px) saturate(110%);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        .extra-panel.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .extra-sidebar {
+            width: 260px;
+            /* use a richer dark card for the sidebar so white text is readable */
+            background: linear-gradient(180deg, rgba(26,30,38,0.98), rgba(20,24,30,0.98));
+            color: #e8f0ff;
+            border-right: 1px solid rgba(255,255,255,0.04);
+            padding: 22px 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        }
+
+        .extra-menu-item {
+            padding: 12px 18px;
+            color: #cfe3ff;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            border-left: 4px solid transparent;
+            font-weight: 600;
+            border-radius: 6px;
+            margin: 6px 6px;
+        }
+
+        .extra-menu-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: #ffffff;
+            transform: translateX(3px);
+        }
+
+        .extra-menu-item.active {
+            background: linear-gradient(90deg, rgba(102,126,234,0.16), rgba(118,75,162,0.12));
+            border-left-color: #98b9ff;
+            color: #ffffff;
+        }
+
+
+        .extra-content {
+            position: relative;
+            flex: 1;
+            padding: 18px; /* smaller padding so content can use more space */
+            overflow: hidden; /* sections will handle their own scrolling */
+            display: block;
+        }
+
+        /* Make the active content section fill the entire content area (acts like a right-side panel)
+           instead of a centered card. Each section will be absolutely positioned to fill the space
+           and have its own scroll if content overflows. */
+        .extra-content-section {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            right: 18px;
+            bottom: 18px;
+            padding: 22px 26px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(18,22,30,0.92), rgba(12,14,18,0.94));
+            box-shadow: 0 18px 60px rgba(6,8,12,0.7);
+            color: #e9f2ff;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateX(6px) scale(0.998);
+            transition: opacity 0.22s ease, transform 0.26s cubic-bezier(.2,.9,.2,1);
+        }
+
+        .extra-content-section.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            z-index: 10;
+        }
+
+        .extra-content-section.fade-out {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.995);
+        }
+
+        .extra-content h2 {
+            font-size: 2rem;
+            margin-bottom: 18px;
+            color: #fff;
+            text-shadow: none;
+        }
+
+        .extra-content p {
+            font-size: 1.02rem;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            color: #dfefff;
+        }
+
+        .extra-content a { color: #9ec2ff; text-decoration: underline; }
+        .extra-content a:hover { color: #cfe3ff; }
+
+        .fade-overlay {
+            position: absolute;
+            bottom: 18px;
+            left: 0;
+            right: 0;
+            height: 90px;
+            background: linear-gradient(transparent, rgba(4,6,8,0.55));
+            pointer-events: none;
+        }
+
+        /* Connections Section Styles */
+        .profile-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .social-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .social-links a.twitter:hover { background: #1DA1F2; }
+        .social-links a.youtube:hover { background: #FF0000; }
+        .social-links a.github:hover { background: #333; }
+        .social-links a.instagram:hover { background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); }
+        .social-links a.discord:hover { background: #7289DA; }
+        .social-links a.soundcloud:hover { background: #FF5500; }
+        .social-links a.twitch:hover { background: #9146FF; }
+        .social-links a.reddit:hover { background: #FF4500; }
+
+        .about-me {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .about-me h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .about-me p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .extra-sidebar {
+                width: 200px;
+            }
+            
+            .extra-content {
+                padding: 30px;
+            }
+            
+            .extra-content-section {
+                top: 30px;
+                left: 30px;
+                right: 30px;
+                bottom: 30px;
+            }
+        }
+
+        .file-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            color: #667eea;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .file-meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .folders-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .folder-tag {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .folder-tag:hover {
+            background: #5a6fd8;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-area {
+                padding: 20px;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .file-actions {
+                margin-top: 10px;
+            }
+        }
+
+        .queue-item {
+            margin-bottom: 10px;
+        }
+        .progress-container {
+            background: #444;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 10px;
+            margin-top: 5px;
+        }
+        .progress-bar {
+            height: 10px;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.2s;
+        }
+        #uploadCircle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(#667eea 0%, #ddd 0%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        #uploadCircle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #uploadQueue {
+            width: 250px;
+            background: #444;
+            color: #898989;
+            padding: 15px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            transition: width 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        #uploadQueue.hidden {
+            width: 0;
+            opacity: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            flex: 1; /* take up the rest of space */
+            min-width: 400px; /* define your "too small to fit" threshold */
+        }
+        .password-menu {
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #1c1f2b;
+        border: 2px solid #3a3f58;
+        border-radius: 8px;
+        width: 300px;
+        z-index: 2000;
+        display: none;
+        color: white;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .window-header {
+        background: #2a2e45;
+        padding: 8px 10px;
+        cursor: move;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+        border-bottom: 1px solid #3a3f58;
+        }
+
+        .window-body {
+        padding: 15px;
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+        display: none; /* hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(8px); /* blur background */
+        background-color: rgba(0,0,0,0.4); /* semi-transparent dark overlay */
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        }
+
+        /* Modal content box */
+        .modal-content {
+        width: 70%; /* 70% of screen */
+        max-width: 1000px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        overflow-y: auto;
+        max-height: 90%; /* ensure it doesn't overflow screen */
+        animation: fadeIn 0.3s ease;
+        }
+
+        /* Close button */
+        .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        }
+
+        /* Fade in animation */
+        @keyframes fadeIn {
+        from {opacity: 0; transform: scale(0.9);} 
+        to {opacity: 1; transform: scale(1);} 
+        }
+
+    </style>
+</head>
+<body>
+<div id="layoutWrapper" style="display:flex; min-height:100vh;">
+    <div id="uploadQueue">
+        <h3>Upload Queue</h3>
+        <div id="queueList"></div>
+    </div>
+
+    <div id="uploadCircle">0%</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>DisStored</h1>
+            <p>Exploiting discord for file storage.</p>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">🗁</div>
+                    <div class="upload-text">Drag & drop files here or click to browse</div>
+                    <div class="upload-hint">No file size limit - files are automatically split into 9.99MB chunks</div>
+                    <input type="file" id="fileInput" style="display: none;" multiple>
+                </div>
+            </div>
+
+            <div class="folder-section">
+                <div class="folder-input">
+                    <input type="text" id="folderInput" placeholder="Enter folder name">
+                    <button onclick="setCurrentFolder()">Set Folder</button>
+                </div>
+                <div class="folders-list" id="foldersList"></div>
+            </div>
+
+            <div class="breadcrumb" id="breadcrumb">
+                <a href="#" onclick="navigateToFolder('')">Home</a>
+                <span id="currentFolderPath"></span>
+            </div>
+
+            <div class="files-section">
+                <div class="files-header">
+                    <div class="files-title">Files</div>
+                    <button class="extra-btn" onclick="openExtraPanel()">Extra</button>
+                </div>
+                
+                <div class="status-message" id="statusMessage"></div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Uploading...</div>
+                </div>
+
+                <div class="file-list" id="fileList">
+                    {% if files %}
+                        {% for file in files %}
+                        <div class="file-item">
+                            <div class="file-icon">🗎</div>
+                            <div class="file-info">
+                                <div class="file-name">{{ file.name }}</div>
+                                <div class="file-meta">
+                                    Size: {{ "%.2f"|format(file.size / 1024 / 1024) }}MB | 
+                                    Uploaded: {{ file.uploaded_at[:10] }}
+                                    {% if file.folder %}
+                                    | Folder: {{ file.folder }}
+                                    {% endif %}
+                                    {% if file.discord_chunks and file.discord_chunks|length > 1 %}
+                                    | 📦 {{ file.discord_chunks|length }} chunks
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <a href="/download/{{ file.id }}" class="btn btn-primary">Download</a>
+                                <button onclick="deleteFile('{{ file.id }}')" class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="icon">📁</div>
+                            <h3>No files yet</h3>
+                            <p>Upload your first file to get started!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="extra-panel" id="extraPanel">
+        <div class="extra-sidebar">
+            <div class="extra-menu-item active" onclick="switchExtraContent('info', event)">Info</div>
+            <div class="extra-menu-item" onclick="switchExtraContent('source', event)">Source</div>
+            <div class="extra-menu-item" onclick="switchExtraContent('connections', event)">Connections</div>
+            <div class="extra-menu-item" onclick="switchExtraContent('usage', event)">Usage</div>
+        </div>
+        
+        <div class="extra-content">
+            <div class="extra-content-section active" id="extraInfo">
+                <h2>DisStored Information</h2>
+                <p>DisStored is a cloud based file storage solution that uses Discord's own cloud storage infrastructure to provide unlimited file storage capabilities.</p>
+                <p>Key features include automatic file chunking, web-based interface, and seamless integration with Discord webhooks. It's set and forget.</p>
+                <p>This project was heavily inspired by <a href="https://disboxapp.github.io/web/" target="_blank">DisBox</a>, and wouldn't have happened if I hadn't seen it.</p>
+                <p>As a added bonus, your files are completely private! The creator of DisStored can not, and will never be able to get access to anything you upload to DisStored, as all files are hosted by Discord themselves, which means I will not be able to ever get access.</p>
+                <a></a>
+                <p>Tip: press esc (Escape) to leave this menu.</p>
+                <a></a>
+                <p><span style="color: #555555; font-weight: bold;">v1.0.0-P</span></p>
+            </div>
+            
+            <div class="extra-content-section" id="extraSource">
+                <h2>Source & Development</h2>
+                <p>DisStored is built using Python 3.13.5, Flask, and HTML/CSS.</p>
+                <p>DisStored is finally open source! (as of v1.0.0-p)</p>
+                <p>The src is hosted on <a href="https://github.com/hexxedspider/DisStored" target="_blank">GitHub</a>, i don't think (nightly, beta, alpha, preview, etc) versions will exist unless its a big update that i want to extensively test</p>
+                <p>The author of DisStored is <a href="https://github.com/hexxedspider" target="_blank">hexxedspider</a>, who has also worked on previous projects for Discord (see Connections\GitHub).</p>
+            </div>
+            
+            <div class="extra-content-section" id="extraConnections">
+                <h2>Connections</h2>
+
+                <!-- Profile Picture -->
+                <div class="profile-container">
+                    <img src="https://files.catbox.moe/sctw1e.webp" alt="Profile Picture" class="profile-pic">
+                </div>
+
+                <!-- Social Links -->
+                <div class="social-links">
+                    <a href="https://twitter.com/voidstarxii" target="_blank" class="twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://youtube.com/@driftyxii" target="_blank" class="youtube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://github.com/hexxedspider" target="_blank" class="github"><i class="fab fa-github"></i></a>
+                    <a href="https://instagram.com/v4mpkiller" target="_blank" class="instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://discord.com/users/540630501304565803" target="_blank" class="discord"><i class="fab fa-discord"></i></a>
+                    <a href="https://soundcloud.com/driftyxii" target="_blank" class="soundcloud"><i class="fab fa-soundcloud"></i></a>
+                    <a href="https://twitch.tv/voidstarxii" target="_blank" class="twitch"><i class="fab fa-twitch"></i></a>
+                    <a href="https://reddit.com/user/suicidespiders" target="_blank" class="reddit"><i class="fab fa-reddit"></i></a>
+                </div>
+
+                <!-- About Me -->
+                <div class="about-me">
+                    <h3>~Discord/Storage/RynsSpace/README.md</h3>
+                    <p>hey. i have many different names, click on my pfp to see the list.</p>
+                    <a></a>
+                    <p>besides for that, my main names are v4mp(ire), spider, and hira, along with hex(xed). other than messing with discord at every chance i get, i spend a lot of time making music, even if it isn't widely loved.<p>
+                </div>
+            </div>
+
+            <div class="extra-content-section" id="extraUsage">
+                <h2>Usage</h2>
+                <p>To use DisStored, first you need to create a server.</p>
+                <p>1: Make a server.</p>
+                <p>2: Create a webhook by going into the settings and tapping on "Integrations" and creating one.</p>
+                <p>3: Copy the webhook url and paste it into the webhook url field in the .env file, which config.py will then pick up and use.</p>
+                <p>4: Start the server by running the run.bat file, using "python app.py", or other means of running the server.</p>
+                <p>5: A browser tab will open automatically, hence what you're on right now.</p>
+                <p>6: Upload files by dragging and dropping them into the upload area or clicking the upload area.</p>
+                <p>7: If the uploaded files go above the 10mb standard Discord limit, the file will be broken down into pieces and sent into to the same channel, but still remain intact. You will then be able to download the file by clicking the "Download" button.</p>
+            </div>
+            
+            <div class="fade-overlay"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentFolder = '{{ current_folder }}';
+        
+        // Update breadcrumb
+        function updateBreadcrumb() {
+            const breadcrumb = document.getElementById('currentFolderPath');
+            if (currentFolder) {
+                breadcrumb.textContent = ` > ${currentFolder}`;
+            } else {
+                breadcrumb.textContent = '';
+            }
+        }
+        
+        updateBreadcrumb();
+
+        // Upload functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            uploadFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            uploadFiles(e.target.files);
+        });
+
+        function uploadFiles(files) {
+            Array.from(files).forEach(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('folder', currentFolder);
+                
+                showLoading(true);
+                
+                fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.text().then(text => {
+                        console.log('Response text:', text);
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error('Failed to parse JSON:', text);
+                            throw new Error('Server returned invalid JSON');
+                        }
+                    });
+                })
+                .then(data => {
+                    showLoading(false);
+                    if (data.success) {
+                        showStatus(`File ${file.name} uploaded successfully!`, 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showStatus(data.error || 'Upload failed', 'error');
+                    }
+                })
+                .catch(error => {
+                    showLoading(false);
+                    console.error('Upload error:', error);
+                    showStatus('Upload failed: ' + error.message, 'error');
+                });
+            });
+        }
+
+        function deleteFile(fileId) {
+            if (confirm('Are you sure you want to delete this file?')) {
+                fetch(`/delete/${fileId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    showStatus('Delete failed: ' + error.message, 'error');
+                });
+            }
+        }
+
+        function setCurrentFolder() {
+            const folderInput = document.getElementById('folderInput');
+            const newFolder = folderInput.value.trim();
+            if (!newFolder) return;
+
+            // Call backend to create the folder
+            fetch('/create_folder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ folder: newFolder })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    currentFolder = newFolder;
+                    // Add to UI without reload
+                    const foldersList = document.getElementById('foldersList');
+                    const folderTag = document.createElement('div');
+                    folderTag.className = 'folder-tag';
+                    folderTag.textContent = newFolder;
+                    folderTag.onclick = () => navigateToFolder(newFolder);
+                    foldersList.appendChild(folderTag);
+
+                    showStatus(`Folder "${newFolder}" created!`, 'success');
+                    navigateToFolder(newFolder);
+                } else {
+                    showStatus(data.error || 'Failed to create folder', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showStatus('Error creating folder: ' + err.message, 'error');
+            });
+        }
+
+        function navigateToFolder(folder) {
+            currentFolder = folder;
+            const url = folder ? `/?folder=${encodeURIComponent(folder)}` : '/';
+            window.location.href = url;
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Load folders
+        fetch('/folders')
+            .then(response => response.json())
+            .then(data => {
+                const foldersList = document.getElementById('foldersList');
+                data.folders.forEach(folder => {
+                    const folderTag = document.createElement('div');
+                    folderTag.className = 'folder-tag';
+                    folderTag.textContent = folder;
+                    folderTag.onclick = () => navigateToFolder(folder);
+                    foldersList.appendChild(folderTag);
+                });
+            });
+
+        // Extra Panel Functionality
+        let currentExtraSection = 'info';
+
+        function openExtraPanel() {
+            const panel = document.getElementById('extraPanel');
+            panel.style.display = 'flex';
+            setTimeout(() => {
+                panel.classList.add('active');
+            }, 10);
+        }
+
+        function closeExtraPanel() {
+            const panel = document.getElementById('extraPanel');
+            panel.classList.remove('active');
+            setTimeout(() => {
+                panel.style.display = 'none';
+            }, 500);
+        }
+
+        function switchExtraContent(section, event) {
+            if (currentExtraSection === section) return;
+
+            // Update menu items
+            document.querySelectorAll('.extra-menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const currentSection = document.getElementById(`extra${currentExtraSection.charAt(0).toUpperCase() + currentExtraSection.slice(1)}`);
+            const newSection = document.getElementById(`extra${section.charAt(0).toUpperCase() + section.slice(1)}`);
+
+            currentSection.classList.add('fade-out');
+
+            setTimeout(() => {
+                currentSection.classList.remove('active', 'fade-out');
+                newSection.classList.add('active');
+                currentExtraSection = section;
+            }, 250);
+        }
+
+        // Close panel with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const panel = document.getElementById('extraPanel');
+                if (panel.classList.contains('active')) {
+                    closeExtraPanel();
+                }
+            }
+        });
+
+        // Preset names/usernames array
+        const names = [
+            "v4mp",
+            "ryn", 
+            "spider", 
+            "hira",
+            "kira", 
+            "hex",
+            "hexxed", 
+            "drift(y)", 
+            "void", 
+            "zizi",
+            "crow",
+            "vurp",
+            "nebula",
+            "Blex",
+            "BlexxedNYXH",
+            "404",
+            "yashakami",
+            "enigami/enikami",
+            "swiped",
+            "Holy$pirit",
+            "childscry",
+            "zvki",
+            "DrkuInHiding",
+            "Reapr",
+            "ThatLoserV4MP",
+            "owuocrow"
+        ];
+
+        // Populate popup when opened
+        function openPopup() {
+            const list = document.getElementById('namesList');
+            list.innerHTML = ""; // clear before inserting
+            names.forEach(name => {
+                const div = document.createElement('div');
+                div.textContent = name;
+                list.appendChild(div);
+            });
+
+            document.getElementById('popupOverlay').style.display = "flex";
+        }
+
+        function closePopup() {
+            document.getElementById('popupOverlay').style.display = "none";
+        }
+
+        // Close popup on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "Backspace") closePopup();
+        });
+
+        // Attach to profile picture
+        document.querySelector('.profile-pic').addEventListener('click', openPopup);
+
+        let uploadQueue = [];
+        let uploading = false;
+
+        function uploadFiles(files) {
+            Array.from(files).forEach(file => {
+                addToQueue(file);
+            });
+            processQueue();
+        }
+
+        let uploadCounter = 0;
+        function addToQueue(file) {
+            const safeName = file.name.replace(/[^a-z0-9]/gi, '');
+            const barId = `progress-${safeName}-${uploadCounter++}`;
+            const queueList = document.getElementById("queueList");
+            const item = document.createElement("div");
+            item.className = "queue-item";
+            item.innerHTML = `
+                <div>${file.name}</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="${barId}"></div>
+                </div>
+            `;
+            queueList.appendChild(item);
+            uploadQueue.push({ file, barId });
+        }
+
+        function processQueue() {
+            if (uploading || uploadQueue.length === 0) return;
+            uploading = true;
+            const queueItem = uploadQueue.shift();
+            uploadFileSequential(queueItem, () => {
+                uploading = false;
+                processQueue(); // Start next
+            });
+        }
+
+        function uploadFileSequential(queueItem, callback) {
+            const { file, barId } = queueItem;
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", currentFolder);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/upload");
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    const bar = document.getElementById(barId);
+                    if (bar) bar.style.width = percent + "%";
+
+                    // update circle
+                    const circle = document.getElementById("uploadCircle");
+                    if (circle) {
+                        circle.textContent = percent + "%";
+                        circle.style.background = `conic-gradient(#667eea ${percent}%, #ddd ${percent}%)`;
+                    }
+                }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    showStatus(`File ${file.name} uploaded successfully!`, "success");
+                    const bar = document.getElementById(barId);
+                    if (bar) bar.style.background = "#28a745"; // green when done
+                } else {
+                    showStatus(`Upload failed for ${file.name}`, "error");
+                }
+                callback();
+            };
+
+            xhr.onerror = () => {
+                showStatus(`Error uploading ${file.name}`, "error");
+                callback();
+            };
+
+            xhr.send(formData);
+        }
+
+    function checkLayout() {
+        const queue = document.getElementById("uploadQueue");
+        const circle = document.getElementById("uploadCircle");
+        const container = document.querySelector(".container");
+
+        if (container.offsetWidth < 500) {
+            // hide queue smoothly
+            queue.classList.add("hidden");
+            // show circle smoothly
+            circle.classList.add("active");
+        } else {
+            // show queue smoothly
+            queue.classList.remove("hidden");
+            // hide circle smoothly
+            circle.classList.remove("active");
+        }
+    }
+
+    window.addEventListener("resize", checkLayout);
+    window.addEventListener("load", checkLayout);
+
+    const circle = document.getElementById("uploadCircle");
+    if (circle) {
+        circle.textContent = "0%";
+        circle.style.background = "conic-gradient(#667eea 0%, #ddd 0%)";
+    }
+    document.addEventListener("keydown", function(e) {
+    if (e.shiftKey && e.key.toLowerCase() === "p") {
+        const menu = document.getElementById("passwordMenu");
+        menu.classList.toggle("show");
+    }
+    });
+
+    function login() {
+    const pw = document.getElementById("passwordInput").value;
+    fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "password=" + encodeURIComponent(pw)
+    }).then(res => {
+        if (res.ok) {
+        alert("Login successful!");
+        location.reload();
+        } else {
+        alert("Invalid password");
+        }
+    });
+    }
+
+    function setPassword() {
+    const newPw = document.getElementById("newPasswordInput").value;
+    fetch("/set_password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: newPw })
+    }).then(res => {
+        if (res.ok) {
+        alert("Password updated!");
+        document.getElementById("newPasswordInput").value = "";
+        } else {
+        alert("Failed to update password");
+        }
+    });
+    }
+    function makeDraggable(element, handle) {
+    let offsetX = 0, offsetY = 0, isDragging = false;
+
+    handle.onmousedown = (e) => {
+        isDragging = true;
+        offsetX = e.clientX - element.offsetLeft;
+        offsetY = e.clientY - element.offsetTop;
+        document.onmousemove = (e) => {
+        if (isDragging) {
+            element.style.left = (e.clientX - offsetX) + "px";
+            element.style.top = (e.clientY - offsetY) + "px";
+            element.style.transform = "none"; // disable center transform while dragging
+        }
+        };
+        document.onmouseup = () => {
+        isDragging = false;
+        document.onmousemove = null;
+        document.onmouseup = null;
+        };
+    };
+    }
+
+    // Enable dragging for password menu
+    window.onload = function() {
+    const menu = document.getElementById("passwordMenu");
+    const header = document.getElementById("passwordMenuHeader");
+    makeDraggable(menu, header);
+    };
+
+    // DRAGGABLE PASSWORD MENU
+    const passwordMenu = document.querySelector('.password-menu');
+    const windowHeader = passwordMenu.querySelector('.window-header');
+
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    windowHeader.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // prevent text selection
+        isDragging = true;
+
+        // calculate the offset between mouse and window top-left
+        const rect = passwordMenu.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        // move the menu
+        passwordMenu.style.left = `${e.clientX - offsetX}px`;
+        passwordMenu.style.top = `${e.clientY - offsetY}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    const modal = document.getElementById('popupModal');
+    const closeBtn = document.getElementById('closeModal');
+
+    // Open modal (Shift + P)
+    document.addEventListener('keydown', (e) => {
+    if (e.shiftKey && e.key.toLowerCase() === 'p') {
+        modal.style.display = 'flex';
+    }
+    });
+
+    // Close modal on button click
+    closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+    });
+
+    // Close modal if clicking outside content
+    window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+    }
+    });
+
+
+    </script>
+<!-- Popup Modal -->
+<div class="popup-overlay" id="popupOverlay">
+<div class="popup-menu">
+<span class="popup-close" onclick="closePopup()">&times;</span>
+<h2>Aliases</h2>
+<div class="popup-content" id="namesList"></div>
+</div>
+</div>
+
+<!-- Modal Overlay -->
+<div id="popupModal" class="modal-overlay">
+<div class="modal-content">
+<span id="closeModal" class="close-btn">&times;</span>
+<h2>Login / Action</h2>
+<p>Your modal content goes here.</p>
+</div>
+</div>
+
+<div id="passwordMenu" class="password-menu">
+<div class="window-header" id="passwordMenuHeader">
+<span>Password Menu</span>
+<span class="popup-close" onclick="document.getElementById('passwordMenu').classList.remove('show')">&times;</span>
+</div>
+
+<div class="window-body">
+<h3>Enter Password</h3>
+<input type="password" id="passwordInput" placeholder="Password">
+<button onclick="login()">Login</button>
+
+<h3>Set Access Password</h3>
+<input type="password" id="newPasswordInput" placeholder="New Password">
+<button onclick="setPassword()">Set Password</button>
+</div>
+</div>
+
+</body>
+</html>
